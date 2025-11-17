@@ -33,10 +33,6 @@ public class SessionManager {
         return currentUser != null;
     }
 
-    public boolean isAdmin() {
-        return currentUser != null && currentUser.isAdmin();
-    }
-
     public void logout() {
         currentUser = null;
         cart.clear();
@@ -47,12 +43,6 @@ public class SessionManager {
     }
 
     public void addToCart(CartItem item) {
-        for (CartItem cartItem : cart) {
-            if (cartItem.getDish().getDishId() == item.getDish().getDishId()) {
-                cartItem.setQuantity(cartItem.getQuantity() + item.getQuantity());
-                return;
-            }
-        }
         cart.add(item);
     }
 
@@ -67,7 +57,7 @@ public class SessionManager {
     public double getCartTotal() {
         double total = 0;
         for (CartItem item : cart) {
-            total += item.getSubtotal();
+            total += item.getDish().getPrice() * item.getQuantity();
         }
         return total;
     }

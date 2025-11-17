@@ -1,4 +1,4 @@
-package com.restaurant.luch.models;
+package com.restaurant.luch.model;
 
 public class Category {
     private int categoryId;

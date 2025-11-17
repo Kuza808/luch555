@@ -1,4 +1,4 @@
-package com.restaurant.luch.models;
+package com.restaurant.luch.model;
 
 public class CartItem {
     private Dish dish;
@@ -10,12 +10,7 @@ public class CartItem {
     }
 
     public Dish getDish() { return dish; }
-    public void setDish(Dish dish) { this.dish = dish; }
-
     public int getQuantity() { return quantity; }
     public void setQuantity(int quantity) { this.quantity = quantity; }
-
-    public double getSubtotal() {
-        return dish.getPrice() * quantity;
-    }
 }
+

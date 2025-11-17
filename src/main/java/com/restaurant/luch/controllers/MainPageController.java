@@ -1,182 +1,76 @@
+
 package com.restaurant.luch.controllers;
 
-import com.restaurant.luch.database.CategoryDAO;
-import com.restaurant.luch.database.DishDAO;
-import com.restaurant.luch.database.FavoriteDAO;
-import com.restaurant.luch.model.Category;
-import com.restaurant.luch.model.Dish;
-import com.restaurant.luch.model.CartItem;
-import com.restaurant.luch.utils.SessionManager;
-import com.restaurant.luch.utils.NotificationUtils;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
-import javafx.scene.layout.*;
-import javafx.scene.image.Image;
-import javafx.scene.image.ImageView;
+import javafx.scene.layout.FlowPane;
 import javafx.geometry.Pos;
-import javafx.geometry.Insets;
 import javafx.stage.Stage;
-import javafx.collections.ObservableList;
-import java.io.File;
+import com.restaurant.luch.model.Dish;
+import com.restaurant.luch.model.CartItem;
+import com.restaurant.luch.utils.SessionManager;
+import com.restaurant.luch.utils.NotificationUtils;
 import java.io.IOException;
 
 public class MainPageController {
 
-    @FXML private HBox categoryBar;
-    @FXML private FlowPane dishesContainer;
     @FXML private Label userNameLabel;
     @FXML private Button cartButton;
-    @FXML private Button bookingButton;
     @FXML private Button profileButton;
+    @FXML private FlowPane dishesContainer;
     @FXML private Label cartCountLabel;
 
-    private int selectedCategoryId = 0;
-
     @FXML
-    private void initialize() {
+    public void initialize() {
         if (SessionManager.getInstance().isLoggedIn()) {
             userNameLabel.setText(SessionManager.getInstance().getCurrentUser().getFullName());
         }
 
-        loadCategories();
-        loadAllDishes();
+        displaySampleDishes();
         updateCartCount();
     }
 
-    private void loadCategories() {
-        categoryBar.getChildren().clear();
+    private void displaySampleDishes() {
+        dishesContainer.setHgap(20);
+        dishesContainer.setVgap(20);
 
-        Button allButton = createCategoryButton("Все", 0);
-        allButton.getStyleClass().add("category-button-selected");
-        categoryBar.getChildren().add(allButton);
+        String[] dishNames = {"Паста", "Пицца", "Салат", "Суп", "Напиток"};
+        double[] prices = {350, 500, 250, 150, 80};
 
-        ObservableList<Category> categories = CategoryDAO.getAllCategories();
-        for (Category category : categories) {
-            Button categoryButton = createCategoryButton(category.getCategoryName(), category.getCategoryId());
-            categoryBar.getChildren().add(categoryButton);
-        }
-    }
-
-    private Button createCategoryButton(String name, int categoryId) {
-        Button button = new Button(name);
-        button.getStyleClass().add("category-button");
-        button.setOnAction(e -> {
-            selectedCategoryId = categoryId;
-            updateCategorySelection(button);
-            if (categoryId == 0) {
-                loadAllDishes();
-            } else {
-                loadDishesByCategory(categoryId);
-            }
-        });
-        return button;
-    }
-
-    private void updateCategorySelection(Button selectedButton) {
-        for (javafx.scene.Node node : categoryBar.getChildren()) {
-            if (node instanceof Button) {
-                Button btn = (Button) node;
-                btn.getStyleClass().remove("category-button-selected");
-            }
-        }
-        selectedButton.getStyleClass().add("category-button-selected");
-    }
-
-    private void loadAllDishes() {
-        dishesContainer.getChildren().clear();
-        ObservableList<Dish> dishes = DishDAO.getAllDishes();
-        displayDishes(dishes);
-    }
-
-    private void loadDishesByCategory(int categoryId) {
-        dishesContainer.getChildren().clear();
-        ObservableList<Dish> dishes = DishDAO.getDishesByCategory(categoryId);
-        displayDishes(dishes);
-    }
-
-    private void displayDishes(ObservableList<Dish> dishes) {
-        int userId = SessionManager.getInstance().getCurrentUser().getUserId();
-
-        for (Dish dish : dishes) {
-            VBox dishCard = createDishCard(dish, userId);
+        for (int i = 0; i < dishNames.length; i++) {
+            VBox dishCard = createDishCard(i + 1, dishNames[i], prices[i]);
             dishesContainer.getChildren().add(dishCard);
         }
     }
 
-    private VBox createDishCard(Dish dish, int userId) {
+    private VBox createDishCard(int id, String name, double price) {
         VBox card = new VBox(10);
-        card.getStyleClass().add("dish-card");
-        card.setPrefWidth(250);
+        card.setStyle("-fx-border-color: #ddd; -fx-border-radius: 10; -fx-padding: 15; -fx-background-color: white;");
+        card.setPrefWidth(200);
         card.setAlignment(Pos.TOP_CENTER);
-        card.setPadding(new Insets(15));
 
-        ImageView imageView = new ImageView();
-        imageView.setFitWidth(220);
-        imageView.setFitHeight(150);
-        imageView.setPreserveRatio(false);
+        Label nameLabel = new Label(name);
+        nameLabel.setStyle("-fx-font-size: 18; -fx-font-weight: bold;");
 
-        if (dish.getImagePath() != null && !dish.getImagePath().isEmpty()) {
-            File imageFile = new File(dish.getImagePath());
-            if (imageFile.exists()) {
-                imageView.setImage(new Image(imageFile.toURI().toString()));
-            } else {
-                imageView.setImage(new Image(getClass().getResourceAsStream("/images/default-dish.png")));
-            }
-        } else {
-            imageView.setImage(new Image(getClass().getResourceAsStream("/images/default-dish.png")));
-        }
+        Label priceLabel = new Label(price + " ₽");
+        priceLabel.setStyle("-fx-font-size: 16; -fx-text-fill: #2e7d32;");
 
-        Label nameLabel = new Label(dish.getDishName());
-        nameLabel.getStyleClass().add("dish-name");
-        nameLabel.setWrapText(true);
-        nameLabel.setMaxWidth(220);
+        Button addBtn = new Button("В корзину");
+        addBtn.setPrefWidth(180);
+        addBtn.setStyle("-fx-font-size: 14; -fx-background-color: #2e7d32; -fx-text-fill: white;");
+        addBtn.setOnAction(e -> {
+            Dish dish = new Dish(id, name, "", price, 1);
+            CartItem item = new CartItem(dish, 1);
+            SessionManager.getInstance().addToCart(item);
+            updateCartCount();
+            NotificationUtils.showSuccess("Успех", name + " добавлено в корзину!");
+        });
 
-        Label descLabel = new Label(dish.getDescription());
-        descLabel.getStyleClass().add("dish-description");
-        descLabel.setWrapText(true);
-        descLabel.setMaxWidth(220);
-
-        Label priceLabel = new Label(String.format("%.2f ₽", dish.getPrice()));
-        priceLabel.getStyleClass().add("dish-price");
-
-        Button favoriteButton = new Button();
-        favoriteButton.getStyleClass().add("favorite-button");
-        boolean isFav = FavoriteDAO.isFavorite(userId, dish.getDishId());
-        favoriteButton.setText(isFav ? "❤" : "♡");
-        favoriteButton.setOnAction(e -> toggleFavorite(favoriteButton, userId, dish.getDishId()));
-
-        Button addToCartButton = new Button("В корзину");
-        addToCartButton.getStyleClass().add("add-to-cart-button");
-        addToCartButton.setOnAction(e -> addToCart(dish));
-
-        HBox topBar = new HBox(favoriteButton);
-        topBar.setAlignment(Pos.TOP_RIGHT);
-
-        card.getChildren().addAll(topBar, imageView, nameLabel, descLabel, priceLabel, addToCartButton);
-
+        card.getChildren().addAll(nameLabel, priceLabel, addBtn);
         return card;
-    }
-
-    private void toggleFavorite(Button button, int userId, int dishId) {
-        if (button.getText().equals("♡")) {
-            if (FavoriteDAO.addToFavorites(userId, dishId)) {
-                button.setText("❤");
-            }
-        } else {
-            if (FavoriteDAO.removeFromFavorites(userId, dishId)) {
-                button.setText("♡");
-            }
-        }
-    }
-
-    private void addToCart(Dish dish) {
-        CartItem item = new CartItem(dish, 1);
-        SessionManager.getInstance().addToCart(item);
-        updateCartCount();
-        NotificationUtils.showSuccess("Добавлено", dish.getDishName() + " добавлено в корзину!");
     }
 
     private void updateCartCount() {
@@ -186,30 +80,31 @@ public class MainPageController {
 
     @FXML
     private void handleCart() {
-        loadScene("Cart.fxml", "Корзина");
-    }
-
-    @FXML
-    private void handleBooking() {
-        loadScene("Booking.fxml", "Бронирование");
+        loadScene("cart.fxml", "Корзина");
     }
 
     @FXML
     private void handleProfile() {
-        loadScene("Profile.fxml", "Профиль");
+        loadScene("profile.fxml", "Профиль");
+    }
+
+    @FXML
+    private void handleLogout() {
+        SessionManager.getInstance().logout();
+        loadScene("login.fxml", "Вход");
     }
 
     private void loadScene(String fxmlFile, String title) {
         try {
             Parent root = FXMLLoader.load(getClass().getResource("/views/" + fxmlFile));
             Stage stage = (Stage) cartButton.getScene().getWindow();
-            Scene scene = new Scene(root);
-            scene.getStylesheets().add(getClass().getResource("/styles/green-theme.css").toExternalForm());
+            Scene scene = new Scene(root, 1200, 800);
             stage.setScene(scene);
             stage.setTitle(title);
             stage.show();
         } catch (IOException e) {
             e.printStackTrace();
+            NotificationUtils.showError("Ошибка", "Не удалось загрузить экран: " + fxmlFile);
         }
     }
 }

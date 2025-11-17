@@ -1,7 +1,7 @@
 package controllers;
 
 import database.BookingDAO;
-import models.Booking;
+import model.Booking;
 import utils.SessionManager;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;

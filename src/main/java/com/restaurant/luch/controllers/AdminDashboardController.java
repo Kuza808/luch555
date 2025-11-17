@@ -1,4 +1,4 @@
-package com.restaurant.luch.controller;
+package com.restaurant.luch.controllers;
 
 import com.restaurant.luch.database.*;
 import com.restaurant.luch.model.*;

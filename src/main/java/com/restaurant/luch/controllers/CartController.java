@@ -1,17 +1,15 @@
-package controllers;
+package com.restaurant.luch.controllers;
 
-import database.OrderDAO;
-import models.CartItem;
-import models.Order;
-import utils.SessionManager;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
-import javafx.scene.layout.*;
+import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
-import javafx.collections.ObservableList;
+import com.restaurant.luch.model.CartItem;
+import com.restaurant.luch.utils.SessionManager;
+import com.restaurant.luch.utils.NotificationUtils;
 import java.io.IOException;
 
 public class CartController {
@@ -24,157 +22,87 @@ public class CartController {
     @FXML private Button backButton;
 
     @FXML
-    private void initialize() {
-        // Заполнить способы оплаты
-        paymentMethodCombo.getItems().addAll("Наличными", "Картой", "Онлайн оплата");
-        paymentMethodCombo.setValue("Наличными");
-
-        loadCartItems();
+    public void initialize() {
+        paymentMethodCombo.getItems().addAll("Наличные", "Карта", "Онлайн");
+        paymentMethodCombo.setValue("Карта");
+        displayCartItems();
         updateTotal();
     }
 
-    private void loadCartItems() {
+    private void displayCartItems() {
         cartItemsContainer.getChildren().clear();
-        ObservableList<CartItem> cart = SessionManager.getInstance().getCart();
 
-        if (cart.isEmpty()) {
-            Label emptyLabel = new Label("Корзина пуста");
-            emptyLabel.setStyle("-fx-font-size: 18px; -fx-text-fill: #757575;");
-            cartItemsContainer.getChildren().add(emptyLabel);
-            placeOrderButton.setDisable(true);
-        } else {
-            for (CartItem item : cart) {
-                HBox itemBox = createCartItemBox(item);
-                cartItemsContainer.getChildren().add(itemBox);
-            }
-            placeOrderButton.setDisable(false);
+        for (CartItem item : SessionManager.getInstance().getCart()) {
+            HBox itemRow = new HBox(10);
+            itemRow.setStyle("-fx-padding: 10; -fx-border-color: #eee;");
+
+            Label nameLabel = new Label(item.getDish().getDishName());
+            nameLabel.setPrefWidth(150);
+
+            Label priceLabel = new Label(item.getDish().getPrice() + " ₽");
+            priceLabel.setPrefWidth(100);
+
+            Spinner<Integer> quantitySpinner = new Spinner<>(1, 100, item.getQuantity());
+            quantitySpinner.setPrefWidth(80);
+            quantitySpinner.valueProperty().addListener((obs, oldVal, newVal) -> {
+                item.setQuantity(newVal);
+                updateTotal();
+            });
+
+            Button removeBtn = new Button("Удалить");
+            removeBtn.setOnAction(e -> {
+                SessionManager.getInstance().removeFromCart(item);
+                displayCartItems();
+                updateTotal();
+            });
+
+            itemRow.getChildren().addAll(nameLabel, priceLabel, quantitySpinner, removeBtn);
+            cartItemsContainer.getChildren().add(itemRow);
         }
-    }
-
-    private HBox createCartItemBox(CartItem item) {
-        HBox box = new HBox(20);
-        box.getStyleClass().add("cart-item");
-        box.setPrefHeight(80);
-        box.setStyle("-fx-padding: 10; -fx-background-color: white; -fx-background-radius: 5;");
-
-        // Название блюда
-        Label nameLabel = new Label(item.getDish().getDishName());
-        nameLabel.setStyle("-fx-font-size: 16px; -fx-font-weight: bold;");
-        nameLabel.setPrefWidth(200);
-
-        // Цена за единицу
-        Label priceLabel = new Label(String.format("%.2f ₽", item.getDish().getPrice()));
-        priceLabel.setStyle("-fx-font-size: 14px;");
-        priceLabel.setPrefWidth(80);
-
-        // Количество
-        Spinner<Integer> quantitySpinner = new Spinner<>(1, 50, item.getQuantity());
-        quantitySpinner.setPrefWidth(80);
-        quantitySpinner.valueProperty().addListener((obs, oldVal, newVal) -> {
-            item.setQuantity(newVal);
-            updateTotal();
-        });
-
-        // Промежуточная сумма
-        Label subtotalLabel = new Label(String.format("%.2f ₽", item.getSubtotal()));
-        subtotalLabel.setStyle("-fx-font-size: 16px; -fx-font-weight: bold; -fx-text-fill: #2e7d32;");
-        subtotalLabel.setPrefWidth(100);
-
-        // Обновление промежуточной суммы при изменении количества
-        quantitySpinner.valueProperty().addListener((obs, oldVal, newVal) -> {
-            subtotalLabel.setText(String.format("%.2f ₽", item.getSubtotal()));
-        });
-
-        // Кнопка удаления
-        Button removeButton = new Button("✖");
-        removeButton.setStyle("-fx-background-color: #c70000; -fx-text-fill: white; -fx-font-weight: bold;");
-        removeButton.setOnAction(e -> {
-            SessionManager.getInstance().removeFromCart(item);
-            loadCartItems();
-            updateTotal();
-        });
-
-        Region spacer = new Region();
-        HBox.setHgrow(spacer, Priority.ALWAYS);
-
-        box.getChildren().addAll(nameLabel, priceLabel, quantitySpinner, subtotalLabel, spacer, removeButton);
-
-        return box;
     }
 
     private void updateTotal() {
         double total = SessionManager.getInstance().getCartTotal();
-        totalLabel.setText(String.format("Итого: %.2f ₽", total));
+        totalLabel.setText("Итого: " + total + " ₽");
     }
 
     @FXML
     private void handlePlaceOrder() {
-        if (SessionManager.getInstance().getCart().isEmpty()) {
-            showAlert(Alert.AlertType.WARNING, "Корзина пуста", "Добавьте блюда перед оформлением заказа");
-            return;
-        }
-
         String address = addressField.getText().trim();
+        String paymentMethod = paymentMethodCombo.getValue();
+
         if (address.isEmpty()) {
-            showAlert(Alert.AlertType.WARNING, "Адрес не указан", "Пожалуйста, укажите адрес доставки");
+            NotificationUtils.showWarning("Предупреждение", "Введите адрес доставки");
             return;
         }
 
-        String paymentMethod = convertPaymentMethod(paymentMethodCombo.getValue());
-
-        // Создание заказа
-        Order order = new Order();
-        order.setUserId(SessionManager.getInstance().getCurrentUser().getUserId());
-        order.setDeliveryAddress(address);
-        order.setPaymentMethod(paymentMethod);
-        order.setTotalAmount(SessionManager.getInstance().getCartTotal());
-        order.setOrderItems(SessionManager.getInstance().getCart());
-
-        if (OrderDAO.createOrder(order)) {
-            SessionManager.getInstance().clearCart();
-            showSuccessMessage();
-        } else {
-            showAlert(Alert.AlertType.ERROR, "Ошибка", "Не удалось оформить заказ. Попробуйте снова.");
+        if (SessionManager.getInstance().getCart().isEmpty()) {
+            NotificationUtils.showWarning("Предупреждение", "Корзина пуста");
+            return;
         }
-    }
 
-    private String convertPaymentMethod(String method) {
-        switch (method) {
-            case "Наличными": return "cash";
-            case "Картой": return "card";
-            case "Онлайн оплата": return "online";
-            default: return "cash";
+        NotificationUtils.showSuccess("Успех", "Спасибо за заказ! Мы с вами скоро свяжемся.");
+        SessionManager.getInstance().clearCart();
+
+        try {
+            Thread.sleep(2000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
         }
-    }
 
-    private void showSuccessMessage() {
-        Alert alert = new Alert(Alert.AlertType.INFORMATION);
-        alert.setTitle("Заказ оформлен");
-        alert.setHeaderText(null);
-        alert.setContentText("Спасибо за заказ! Мы с вами скоро свяжемся.");
-        alert.showAndWait();
         handleBack();
-    }
-
-    private void showAlert(Alert.AlertType type, String title, String message) {
-        Alert alert = new Alert(type);
-        alert.setTitle(title);
-        alert.setHeaderText(null);
-        alert.setContentText(message);
-        alert.showAndWait();
     }
 
     @FXML
     private void handleBack() {
-        loadScene("MainPage.fxml", "Главная страница");
+        loadScene("mainpage.fxml", "Главное меню");
     }
 
     private void loadScene(String fxmlFile, String title) {
         try {
             Parent root = FXMLLoader.load(getClass().getResource("/views/" + fxmlFile));
             Stage stage = (Stage) backButton.getScene().getWindow();
-            Scene scene = new Scene(root);
-            scene.getStylesheets().add(getClass().getResource("/styles/green-theme.css").toExternalForm());
+            Scene scene = new Scene(root, 1200, 800);
             stage.setScene(scene);
             stage.setTitle(title);
             stage.show();

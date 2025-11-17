@@ -1,6 +1,6 @@
 package com.restaurant.luch.controllers;
 
-import com.restaurant.luch.models.*;
+import com.restaurant.luch.model.*;
 import com.restaurant.luch.service.RestaurantService;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
@@ -19,29 +19,46 @@ import java.util.*;
  */
 public class MainController implements Initializable {
 
-    @FXML private TabPane mainTabPane;
-    @FXML private Tab menuTab;
-    @FXML private Tab orderTab;
-    @FXML private Tab bookingTab;
-    @FXML private Tab profileTab;
+    @FXML
+    private TabPane mainTabPane;
+    @FXML
+    private Tab menuTab;
+    @FXML
+    private Tab orderTab;
+    @FXML
+    private Tab bookingTab;
+    @FXML
+    private Tab profileTab;
 
     // Компоненты меню - ИСПРАВЛЕНО: TilePane вместо VBox
-    @FXML private TilePane menuContainer;
-    @FXML private ComboBox<String> categoryFilter;
-    @FXML private TextField searchField;
+    @FXML
+    private TilePane menuContainer;
+    @FXML
+    private ComboBox<String> categoryFilter;
+    @FXML
+    private TextField searchField;
 
     // Компоненты заказа
-    @FXML private VBox orderItemsContainer;
-    @FXML private Label orderTotalLabel;
-    @FXML private Label itemsCountLabel;
+    @FXML
+    private VBox orderItemsContainer;
+    @FXML
+    private Label orderTotalLabel;
+    @FXML
+    private Label itemsCountLabel;
 
     // Компоненты бронирования
-    @FXML private DatePicker bookingDatePicker;
-    @FXML private ComboBox<String> timeComboBox;
-    @FXML private ComboBox<Integer> guestsComboBox;
-    @FXML private ComboBox<String> tableTypeComboBox;
-    @FXML private TextArea specialRequestsArea;
-    @FXML private VBox bookingsContainer;
+    @FXML
+    private DatePicker bookingDatePicker;
+    @FXML
+    private ComboBox<String> timeComboBox;
+    @FXML
+    private ComboBox<Integer> guestsComboBox;
+    @FXML
+    private ComboBox<String> tableTypeComboBox;
+    @FXML
+    private TextArea specialRequestsArea;
+    @FXML
+    private VBox bookingsContainer;
 
     // Данные
     private ObservableList<Dish> menuItems;
@@ -60,7 +77,8 @@ public class MainController implements Initializable {
     /**
      * Инициализация данных
      */
-    private void initializeData() {
+    private void initializeData()
+    {
         // Инициализация сервиса
         restaurantService = RestaurantService.getInstance();
 

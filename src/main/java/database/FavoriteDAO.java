@@ -1,7 +1,7 @@
 package database;
 
 import com.google.gson.*;
-import models.Dish;
+import model.Dish;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import java.io.IOException;

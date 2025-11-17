@@ -1,4 +1,4 @@
-package com.restaurant.luch.models;
+package com.restaurant.luch.model;
 
 import java.time.LocalDate;
 import java.time.LocalTime;

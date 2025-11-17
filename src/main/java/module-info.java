@@ -12,7 +12,7 @@ module com.restaurant.luch {
 
     exports com.restaurant.luch;
     exports com.restaurant.luch.controllers;
-    exports com.restaurant.luch.models;
+    exports com.restaurant.luch.model;
     exports com.restaurant.luch.database;
     exports com.restaurant.luch.utils;
     exports com.restaurant.luch.config;

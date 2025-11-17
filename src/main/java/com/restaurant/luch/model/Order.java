@@ -1,4 +1,4 @@
-package com.restaurant.luch.models;
+package com.restaurant.luch.model;
 
 import javafx.collections.ObservableList;
 import java.time.LocalDateTime;

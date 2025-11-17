@@ -7,14 +7,10 @@ public class ValidationUtils {
     }
 
     public static boolean isValidPhone(String phone) {
-        return phone != null && phone.matches("^\\+?[0-9\\s\\-\\(\\)]{10,}$");
+        return phone != null && phone.length() >= 10;
     }
 
     public static boolean isValidPassword(String password) {
         return password != null && password.length() >= 6;
-    }
-
-    public static boolean isValidUsername(String username) {
-        return username != null && username.length() >= 3 && username.length() <= 50;
     }
 }
