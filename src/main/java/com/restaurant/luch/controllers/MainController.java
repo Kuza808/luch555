@@ -1,10 +1,9 @@
-package com.restaurant.luch.controller;
+package com.restaurant.luch.controllers;
 
-import com.restaurant.luch.model.*;
+import com.restaurant.luch.models.*;
 import com.restaurant.luch.service.RestaurantService;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
-import javafx.geometry.Insets;
 import javafx.scene.control.*;
 import javafx.scene.layout.*;
 import javafx.collections.FXCollections;

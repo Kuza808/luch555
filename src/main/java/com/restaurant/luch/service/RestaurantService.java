@@ -1,7 +1,7 @@
 package com.restaurant.luch.service;
 
 
-import com.restaurant.luch.model.*;
+import com.restaurant.luch.models.*;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 

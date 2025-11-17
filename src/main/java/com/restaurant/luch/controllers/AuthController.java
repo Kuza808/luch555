@@ -1,4 +1,4 @@
-package com.restaurant.luch.controller;
+package com.restaurant.luch.controllers;
 
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;

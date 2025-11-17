@@ -6,7 +6,7 @@
 
 <VBox xmlns="http://javafx.com/fxml"
       xmlns:fx="http://javafx.com/fxml/1"
-      fx:controller="com.restaurant.luch.controller.AuthController"
+      fx:controller="com.restaurant.luch.controllers.AuthController"
       alignment="CENTER"
       style="-fx-background-color: linear-gradient(to bottom right, #8B4513, #A0522D);"
       prefWidth="1000" prefHeight="700">
