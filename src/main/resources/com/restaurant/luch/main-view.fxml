@@ -1,0 +1,262 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.*?>
+
+<VBox xmlns="http://javafx.com/fxml"
+      xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="com.restaurant.luch.controller.MainController"
+      style="-fx-background-color: #FFF8DC;"
+      prefWidth="1200" prefHeight="800">
+
+    <!-- Шапка приложения -->
+    <HBox style="-fx-background-color: #8B4513; -fx-padding: 15 20;" alignment="CENTER_LEFT" spacing="15">
+        <Label text="🍽️" style="-fx-font-size: 24px;"/>
+        <VBox spacing="2">
+            <Label text="Ресторан 'Луч'" style="-fx-text-fill: white; -fx-font-size: 20px; -fx-font-weight: bold;"/>
+            <Label text="Главное меню" style="-fx-text-fill: #D2B48C; -fx-font-size: 12px;"/>
+        </VBox>
+        <Region HBox.hgrow="ALWAYS"/>
+        <Label text="👤 Иван Иванов" style="-fx-text-fill: white; -fx-font-weight: bold;"/>
+        <Button text="Выйти" style="-fx-background-color: #A0522D; -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 3; -fx-padding: 5 15; -fx-cursor: hand;"
+                onMouseEntered="#handleMouseEnter" onMouseExited="#handleMouseExit"/>
+    </HBox>
+
+    <!-- Основной контент -->
+    <TabPane fx:id="mainTabPane" tabClosingPolicy="UNAVAILABLE" VBox.vgrow="ALWAYS">
+
+        <!-- Вкладка Меню -->
+        <Tab fx:id="menuTab" text="🍽️ Меню">
+            <ScrollPane fitToWidth="true" style="-fx-background: transparent; -fx-border-color: transparent;">
+                <VBox spacing="20" style="-fx-padding: 20;">
+
+                    <!-- Панель фильтров -->
+                    <HBox spacing="15" alignment="CENTER_LEFT" style="-fx-padding: 15; -fx-background-color: white; -fx-background-radius: 10; -fx-border-color: #E8D8C8; -fx-border-width: 1;">
+                        <Label text="Фильтры:" style="-fx-text-fill: #8B4513; -fx-font-weight: bold;"/>
+
+                        <VBox spacing="5">
+                            <Label text="Категория" style="-fx-text-fill: #654321; -fx-font-size: 12px;"/>
+                            <ComboBox fx:id="categoryFilter" prefWidth="150"
+                                      style="-fx-background-color: white; -fx-border-color: #D2B48C; -fx-border-radius: 5; -fx-background-radius: 5;"/>
+                        </VBox>
+
+                        <VBox spacing="5">
+                            <Label text="Поиск" style="-fx-text-fill: #654321; -fx-font-size: 12px;"/>
+                            <TextField fx:id="searchField" promptText="Поиск блюд..." prefWidth="200"
+                                       style="-fx-background-color: white; -fx-border-color: #D2B48C; -fx-border-radius: 5; -fx-background-radius: 5; -fx-padding: 5 10;"/>
+                        </VBox>
+                    </HBox>
+
+                    <!-- Сетка меню -->
+                    <TilePane fx:id="menuContainer" hgap="20" vgap="20" prefTileWidth="300" prefTileHeight="200"
+                              style="-fx-padding: 10;"/>
+
+                </VBox>
+            </ScrollPane>
+        </Tab>
+
+        <!-- Вкладка Заказ -->
+        <Tab fx:id="orderTab" text="🛒 Мой заказ">
+            <VBox spacing="20" style="-fx-padding: 20;">
+
+                <!-- Заголовок заказа -->
+                <HBox alignment="CENTER_LEFT" spacing="15" style="-fx-padding: 15; -fx-background-color: white; -fx-background-radius: 10; -fx-border-color: #E8D8C8; -fx-border-width: 1;">
+                    <VBox spacing="5">
+                        <Label text="Текущий заказ" style="-fx-text-fill: #8B4513; -fx-font-size: 18px; -fx-font-weight: bold;"/>
+                        <Label fx:id="itemsCountLabel" text="0 шт." style="-fx-text-fill: #A0522D;"/>
+                    </VBox>
+                    <Region HBox.hgrow="ALWAYS"/>
+                    <VBox spacing="5" alignment="CENTER_RIGHT">
+                        <Label text="Итого:" style="-fx-text-fill: #654321; -fx-font-weight: bold;"/>
+                        <Label fx:id="orderTotalLabel" text="0 ₽" style="-fx-text-fill: #8B4513; -fx-font-size: 24px; -fx-font-weight: bold;"/>
+                    </VBox>
+                </HBox>
+
+                <!-- Список блюд в заказе -->
+                <ScrollPane fitToWidth="true" prefHeight="400"
+                            style="-fx-background: transparent; -fx-border-color: transparent;">
+                    <VBox fx:id="orderItemsContainer" spacing="10" style="-fx-padding: 10;"/>
+                </ScrollPane>
+
+                <!-- Кнопка оформления -->
+                <HBox alignment="CENTER" style="-fx-padding: 20;">
+                    <Button text="🛎️ Оформить заказ" onAction="#handlePlaceOrder"
+                            style="-fx-background-color: #8B4513; -fx-text-fill: white; -fx-font-size: 16px; -fx-font-weight: bold; -fx-background-radius: 8; -fx-padding: 15 40; -fx-cursor: hand;"
+                            onMouseEntered="#handleMouseEnter" onMouseExited="#handleMouseExit"/>
+                </HBox>
+
+            </VBox>
+        </Tab>
+
+        <!-- Вкладка Бронирование -->
+        <Tab fx:id="bookingTab" text="📅 Бронирование">
+            <ScrollPane fitToWidth="true" style="-fx-background: transparent; -fx-border-color: transparent;">
+                <HBox spacing="20" style="-fx-padding: 20;" alignment="TOP_LEFT">
+
+                    <!-- Форма бронирования -->
+                    <VBox spacing="20" prefWidth="400" style="-fx-padding: 20; -fx-background-color: white; -fx-background-radius: 10; -fx-border-color: #E8D8C8; -fx-border-width: 1;">
+                        <Label text="Новое бронирование" style="-fx-text-fill: #8B4513; -fx-font-size: 20px; -fx-font-weight: bold;"/>
+
+                        <VBox spacing="15">
+                            <!-- Дата -->
+                            <VBox spacing="5">
+                                <Label text="Дата *" style="-fx-text-fill: #654321; -fx-font-weight: bold;"/>
+                                <DatePicker fx:id="bookingDatePicker"
+                                            style="-fx-background-color: white; -fx-border-color: #D2B48C; -fx-border-radius: 5; -fx-background-radius: 5;"/>
+                            </VBox>
+
+                            <!-- Время -->
+                            <VBox spacing="5">
+                                <Label text="Время *" style="-fx-text-fill: #654321; -fx-font-weight: bold;"/>
+                                <ComboBox fx:id="timeComboBox"
+                                          style="-fx-background-color: white; -fx-border-color: #D2B48C; -fx-border-radius: 5; -fx-background-radius: 5;"/>
+                            </VBox>
+
+                            <!-- Количество гостей -->
+                            <VBox spacing="5">
+                                <Label text="Количество гостей *" style="-fx-text-fill: #654321; -fx-font-weight: bold;"/>
+                                <ComboBox fx:id="guestsComboBox"
+                                          style="-fx-background-color: white; -fx-border-color: #D2B48C; -fx-border-radius: 5; -fx-background-radius: 5;"/>
+                            </VBox>
+
+                            <!-- Тип стола -->
+                            <VBox spacing="5">
+                                <Label text="Тип стола *" style="-fx-text-fill: #654321; -fx-font-weight: bold;"/>
+                                <ComboBox fx:id="tableTypeComboBox"
+                                          style="-fx-background-color: white; -fx-border-color: #D2B48C; -fx-border-radius: 5; -fx-background-radius: 5;"/>
+                            </VBox>
+
+                            <!-- Особые пожелания -->
+                            <VBox spacing="5">
+                                <Label text="Особые пожелания" style="-fx-text-fill: #654321; -fx-font-weight: bold;"/>
+                                <TextArea fx:id="specialRequestsArea" promptText="Укажите особые пожелания..." prefRowCount="3"
+                                          style="-fx-background-color: white; -fx-border-color: #D2B48C; -fx-border-radius: 5; -fx-background-radius: 5; -fx-padding: 8;"/>
+                            </VBox>
+
+                            <!-- Кнопка бронирования -->
+                            <Button text="📅 Забронировать стол" onAction="#handleCreateBooking"
+                                    style="-fx-background-color: #8B4513; -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 5; -fx-padding: 12 30; -fx-cursor: hand;"
+                                    onMouseEntered="#handleMouseEnter" onMouseExited="#handleMouseExit"/>
+                        </VBox>
+                    </VBox>
+
+                    <!-- Список бронирований -->
+                    <VBox spacing="15" VBox.vgrow="ALWAYS">
+                        <Label text="Мои бронирования" style="-fx-text-fill: #8B4513; -fx-font-size: 18px; -fx-font-weight: bold;"/>
+
+                        <ScrollPane fitToWidth="true" prefHeight="500"
+                                    style="-fx-background: transparent; -fx-border-color: transparent;">
+                            <VBox fx:id="bookingsContainer" spacing="10" style="-fx-padding: 10;"/>
+                        </ScrollPane>
+                    </VBox>
+
+                </HBox>
+            </ScrollPane>
+        </Tab>
+
+        <!-- Вкладка Профиль -->
+        <Tab fx:id="profileTab" text="👤 Профиль">
+            <ScrollPane fitToWidth="true" style="-fx-background: transparent; -fx-border-color: transparent;">
+                <VBox spacing="20" style="-fx-padding: 20;" alignment="TOP_CENTER">
+
+                    <!-- Карточка профиля -->
+                    <VBox spacing="15" style="-fx-padding: 30; -fx-background-color: white; -fx-background-radius: 15; -fx-border-color: #E8D8C8; -fx-border-width: 1; -fx-effect: dropshadow(three-pass-box, rgba(139, 69, 19, 0.1), 10, 0, 0, 0);" prefWidth="600">
+
+                        <!-- Аватар и основная информация -->
+                        <HBox spacing="20" alignment="CENTER_LEFT">
+                            <VBox alignment="CENTER" spacing="5">
+                                <Label text="👤" style="-fx-font-size: 48px;"/>
+                                <Button text="Изменить" style="-fx-background-color: #A0522D; -fx-text-fill: white; -fx-font-size: 10px; -fx-background-radius: 3; -fx-padding: 3 8; -fx-cursor: hand;"
+                                        onMouseEntered="#handleMouseEnter" onMouseExited="#handleMouseExit"/>
+                            </VBox>
+
+                            <VBox spacing="8">
+                                <Label text="Иван Иванов" style="-fx-text-fill: #8B4513; -fx-font-size: 24px; -fx-font-weight: bold;"/>
+                                <Label text="⭐ Постоянный клиент" style="-fx-text-fill: #A0522D; -fx-font-weight: bold;"/>
+                                <Label text="📧 ivan@example.com" style="-fx-text-fill: #654321;"/>
+                                <Label text="📞 +7 (999) 123-45-67" style="-fx-text-fill: #654321;"/>
+                            </VBox>
+                        </HBox>
+
+                        <Separator style="-fx-background-color: #E8D8C8;"/>
+
+                        <!-- Статистика -->
+                        <VBox spacing="10">
+                            <Label text="Статистика" style="-fx-text-fill: #8B4513; -fx-font-size: 18px; -fx-font-weight: bold;"/>
+
+                            <GridPane hgap="20" vgap="10">
+                                <columnConstraints>
+                                    <ColumnConstraints prefWidth="200"/>
+                                    <ColumnConstraints prefWidth="200"/>
+                                </columnConstraints>
+
+                                <Label text="🎯 Всего заказов:" GridPane.rowIndex="0" GridPane.columnIndex="0" style="-fx-text-fill: #654321; -fx-font-weight: bold;"/>
+                                <Label text="12" GridPane.rowIndex="0" GridPane.columnIndex="1" style="-fx-text-fill: #8B4513; -fx-font-weight: bold;"/>
+
+                                <Label text="✅ Завершенных:" GridPane.rowIndex="1" GridPane.columnIndex="0" style="-fx-text-fill: #654321; -fx-font-weight: bold;"/>
+                                <Label text="10" GridPane.rowIndex="1" GridPane.columnIndex="1" style="-fx-text-fill: #8B4513; -fx-font-weight: bold;"/>
+
+                                <Label text="📅 Бронирований:" GridPane.rowIndex="2" GridPane.columnIndex="0" style="-fx-text-fill: #654321; -fx-font-weight: bold;"/>
+                                <Label text="5" GridPane.rowIndex="2" GridPane.columnIndex="1" style="-fx-text-fill: #8B4513; -fx-font-weight: bold;"/>
+
+                                <Label text="💰 Общая сумма:" GridPane.rowIndex="3" GridPane.columnIndex="0" style="-fx-text-fill: #654321; -fx-font-weight: bold;"/>
+                                <Label text="15,800 ₽" GridPane.rowIndex="3" GridPane.columnIndex="1" style="-fx-text-fill: #8B4513; -fx-font-weight: bold;"/>
+                            </GridPane>
+                        </VBox>
+
+                        <Separator style="-fx-background-color: #E8D8C8;"/>
+
+                        <!-- Настройки -->
+                        <VBox spacing="10">
+                            <Label text="Настройки" style="-fx-text-fill: #8B4513; -fx-font-size: 18px; -fx-font-weight: bold;"/>
+
+                            <VBox spacing="8">
+                                <Button text="✏️ Редактировать профиль"
+                                        style="-fx-background-color: #A0522D; -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 5; -fx-padding: 10 20; -fx-cursor: hand; -fx-alignment: CENTER_LEFT;"
+                                        onMouseEntered="#handleMouseEnter" onMouseExited="#handleMouseExit"/>
+
+                                <Button text="🔔 Настройки уведомлений"
+                                        style="-fx-background-color: #A0522D; -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 5; -fx-padding: 10 20; -fx-cursor: hand; -fx-alignment: CENTER_LEFT;"
+                                        onMouseEntered="#handleMouseEnter" onMouseExited="#handleMouseExit"/>
+
+                                <Button text="❤️ Избранные блюда"
+                                        style="-fx-background-color: #A0522D; -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 5; -fx-padding: 10 20; -fx-cursor: hand; -fx-alignment: CENTER_LEFT;"
+                                        onMouseEntered="#handleMouseEnter" onMouseExited="#handleMouseExit"/>
+
+                                <Button text="📱 Привязать телефон"
+                                        style="-fx-background-color: #A0522D; -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 5; -fx-padding: 10 20; -fx-cursor: hand; -fx-alignment: CENTER_LEFT;"
+                                        onMouseEntered="#handleMouseEnter" onMouseExited="#handleMouseExit"/>
+                            </VBox>
+                        </VBox>
+
+                    </VBox>
+
+                    <!-- Система лояльности -->
+                    <VBox spacing="15" style="-fx-padding: 25; -fx-background-color: white; -fx-background-radius: 15; -fx-border-color: #E8D8C8; -fx-border-width: 1;" prefWidth="600">
+                        <Label text="🎯 Программа лояльности" style="-fx-text-fill: #8B4513; -fx-font-size: 20px; -fx-font-weight: bold;"/>
+
+                        <HBox spacing="20" alignment="CENTER_LEFT">
+                            <VBox alignment="CENTER" spacing="5">
+                                <Label text="🥇" style="-fx-font-size: 36px;"/>
+                                <Label text="Золотой уровень" style="-fx-text-fill: #A0522D; -fx-font-weight: bold;"/>
+                            </VBox>
+
+                            <VBox spacing="8">
+                                <Label text="Накоплено бонусов: 1,250" style="-fx-text-fill: #654321; -fx-font-weight: bold;"/>
+                                <ProgressBar progress="0.75" prefWidth="200"
+                                             style="-fx-accent: #8B4513; -fx-background-color: #E8D8C8;"/>
+                                <Label text="До следующего уровня: 250 бонусов" style="-fx-text-fill: #A0522D; -fx-font-size: 11px;"/>
+                                <Label text="💎 15% скидка на все заказы" style="-fx-text-fill: #8B4513; -fx-font-weight: bold;"/>
+                            </VBox>
+                        </HBox>
+                    </VBox>
+
+                </VBox>
+            </ScrollPane>
+        </Tab>
+
+    </TabPane>
+
+</VBox>
